@@ -1,0 +1,13 @@
+.TH yamltojson 1 {{DATE}} OpenECOMP OpenECOMP
+.SH NAME
+yamltojson - convert a yaml file to a json file
+.SH SYNOPSIS
+.HP 20
+yamltojson file.yaml ...
+.SH DESCRIPTION
+Read in a yaml file (whose name must end with ".yaml") and create corresponding json files,
+whose names will end with ".json".
+.SH FILES
+/opt/app/repackage/bin/yamltojson
+
+/opt/app/repackage/man/yamltojson.1

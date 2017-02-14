@@ -1,0 +1,119 @@
+.TH repackage 1 {{DATE}} OpenECOMP OpenECOMP
+.SH NAME
+repackage - package an set of files into debian,
+or docker packages
+.SH SYNOPSIS
+.HP 20
+repackage [-h] [-n] [-c] [-N] [-K] [-v] -b PACKAGETYPE [-u] [-d DIRECTORY]
+[-e ENVIRONFILE] [-o OUTPUTDIRECTORY]
+.SH DESCRIPTION
+Build the specified packages. 'package-type' is one or more of docker, debian,
+(comma-separated), or 'all' to build all of them.
+.SH OPTIONS
+.TP 20
+-h, --help
+show a help message and exit
+.TP 20
+-n, --skipexecution
+indicate the packages and exit
+.TP 20
+-c, --usecache
+if a debian/tar/tgz artifact already exists use it
+.TP 20
+-N, --skipbuild
+skip actually building the packages
+.TP 20
+-K, --keeptempfiles
+keep temp files at exit
+.TP 20
+-v, --verbose
+turn on verbosity
+.TP 20
+-b PACKAGETYPE, --packagetype PACKAGETYPE
+The package-type may be specified multiple times or
+may use a ','-separated or space-separated list. 'all'
+is an alias for all of them.
+Potential values are
+debian, docker, 
+tar or tgz
+.TP 20
+-u, --upload
+Depending on package type -- docker, debian, tar or
+tgz -- uploads the artifact to a remote repository.
+For Docker, uses $DOCKERREGISTRY as the remote
+repository to push the image. For Debian, uses
+$REPACKAGEDEBIANUPLOAD as the command, with {0} as the
+local path to the debian image, {1} as the image name
+with build number, and optionally {2} as groupId (may
+be used as part of the directory path), {3} as the
+image name without the build number, and {4} as the
+image name with no build number and no .deb suffix.
+For additional uploads, this will also look for
+$REPACKAGEDEBIANUPLOAD2, $REPACKAGEDEBIANUPLOAD3,
+etc., and repeat the upload. For tar, uses
+$REPACKAGETARUPLOAD as the command. Everything said
+about $REPACKAGEDEBIANUPLOAD applies to
+$REPACKAGETARUPLOAD. For tgz, uses $REPACKAGETGZUPLOAD
+as the command. Everything said about
+$REPACKAGEDEBIANUPLOAD applies to $REPACKAGETGZUPLOAD.
+In addition, if --multipleuploadversions
+is used, the above will be executed using the list of upload
+version numbers specified there. This is typically used to
+create multiple versions (using --multipleuploadversions) on
+multiple remote repositories (using $REPACKAGE*UPLOAD).
+.TP 20
+-d DIRECTORY, --directory DIRECTORY
+where to find the stage directory and repackage.yaml.
+Defaults to '.'
+.TP 20
+-e ENVIRONFILE, --environfile ENVIRONFILE
+Optional environment file. Overrides
+$REPACKAGEENVFILE, defaults to /dev/null
+.TP 20
+-o OUTPUTDIRECTORY, --outputdirectory OUTPUTDIRECTORY
+Output directory. Defaults to 'output' under --directory
+path.
+.TP 20
+-y FILE, --repackageyaml FILE
+Name of parameter file. Defaults to 'repackage.yaml' or 'repackage.json' under --directory path.
+.TP 20
+-B buildnumber, --buildnumber BUILD-NUMBER
+Build number. Defaults to $BUILD_NUMBER, which defaults to a date-based string.
+.TP 20
+-M MULTIPLEUPLOADVERSIONS, --multipleuploadversions MULTIPLEUPLOADVERSIONS
+Use multiple versions for upload. Comma-separated list
+of {datetime}, {buildnumber} or arbitrary strings.
+Defaults to {buildnumber}, which is the value from
+--buildnumber.
+.SH "DIRECTORY STRUCTURE"
+Repackage requires as its input four items:
+.P
+.TP 20
+stage/*
+A directory structure filled with files laid out exactly
+as they are to appear on the end system, as if "stage" were
+the root of the filesystem. For DCAE applications, it 
+is recommended that you use the path opt/app/PACKAGENAME
+for all files associated with PACKAGENAME.
+.TP 20
+repackage.yaml or repackage.json
+A configuration file with information about the packages,
+such as the package's name, version information,
+dependencies, etc. More information will be provided below.
+.TP 20
+Dockerfile
+This file is only used for creating Docker images. It contains
+the docker creation script.
+.TP 20
+common/*
+If needed, any package installation or package removal scripts
+would be placed here. They must be named preinst, postinst,
+prerm or postrm.
+.P
+If the installation scripts need some temporary files, it is recommended that
+you place them into stage/opt/app/PACKAGENAME/pkg. Your installation script
+can then remove that directory if necessary after successful installation.
+.SH FILES
+/opt/app/repackage/bin/repackage
+
+/opt/app/repackage/man/repackage.1
